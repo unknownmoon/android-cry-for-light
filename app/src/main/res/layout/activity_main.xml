@@ -30,6 +30,13 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email"/>
+        app:backgroundTint="@color/button_toggle_service"
+        android:src="@drawable/button_toggle_service"
+        android:padding="16dp"
+        app:elevation="8dp"
+        android:scaleType="fitCenter"
+        android:onClick="onServiceButtonToggled"
+        android:tint="@color/button_toggle_service_icon"
+        />
 
 </android.support.design.widget.CoordinatorLayout>
