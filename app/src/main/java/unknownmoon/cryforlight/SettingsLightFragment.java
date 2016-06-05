@@ -22,7 +22,5 @@ public class SettingsLightFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.preferences_light);
-
-        Log.d("LF:", "1");
     }
 }
