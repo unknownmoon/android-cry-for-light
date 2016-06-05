@@ -10,10 +10,9 @@
             android:defaultValue="@integer/pref_light_def_val"
             android:key="pref_light"
             android:layout="@layout/preference_slider"
-            android:summary="@string/pref_light_summary"
-            android:title="@string/pref_light_title"
             app:headerLabelText="@string/pref_light_title"
-            app:headerValueFormat="@string/pref_light_value_format"/>
+            app:headerValueFormat="@string/pref_light_value_format"
+            app:summary="@string/pref_light_summary"/>
 
     </PreferenceCategory>
 

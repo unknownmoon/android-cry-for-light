@@ -19,6 +19,7 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
 
     private Boolean mDisplayHeaderLabel;
     private Boolean mDisplayHeaderValue;
+    private String mSummary;
     private String mHeaderLabelText;
     private String mHeaderValueFormat;
     private int mSliderMax;
@@ -33,6 +34,7 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
 
         mDisplayHeaderLabel = a.getBoolean(R.styleable.SliderPreference_displayHeaderLabel, DISPLAY_HEADER_LABEL);
         mDisplayHeaderValue = a.getBoolean(R.styleable.SliderPreference_displayHeaderValue, DISPLAY_HEADER_VALUE);
+        mSummary = a.getString(R.styleable.SliderPreference_summary);
         mHeaderLabelText = a.getString(R.styleable.SliderPreference_headerLabelText);
         mHeaderValueFormat = a.getString(R.styleable.SliderPreference_headerValueFormat);
         mSliderMax = a.getInt(R.styleable.SliderPreference_sliderMaxValue, SLIDER_MAX);
@@ -58,6 +60,7 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
 
         SeekBar seekBarView = (SeekBar) view.findViewById(R.id.pref_seek_bar);
         TextView headerLabelView = (TextView) view.findViewById(R.id.pref_header_label);
+        TextView summaryView = (TextView) view.findViewById(R.id.pref_summary);
         mHeaderValueView = (TextView) view.findViewById(R.id.pref_header_value);
 
         if (seekBarView != null) {
@@ -87,6 +90,14 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
                 mHeaderValueView.setVisibility(View.VISIBLE);
             } else {
                 mHeaderValueView.setVisibility(View.INVISIBLE);
+            }
+        }
+
+        if (summaryView != null) {
+            if (mSummary.length() != 0) {
+                summaryView.setText(mSummary);
+            } else {
+                summaryView.setVisibility(View.INVISIBLE);
             }
         }
 

@@ -10,10 +10,9 @@
             android:defaultValue="@integer/pref_sound_level_def_val"
             android:key="pref_sound_level"
             android:layout="@layout/preference_slider"
-            android:summary="@string/pref_sound_level_summary"
-            android:title="@string/pref_sould_level_title"
             app:headerLabelText="@string/pref_sould_level_title"
-            app:headerValueFormat="@string/pref_sould_level_value_format"/>
+            app:headerValueFormat="@string/pref_sould_level_value_format"
+            app:summary="@string/pref_sound_level_summary"/>
 
     </PreferenceCategory>
 

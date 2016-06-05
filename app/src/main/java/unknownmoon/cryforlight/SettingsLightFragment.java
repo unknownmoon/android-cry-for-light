@@ -4,7 +4,6 @@ package unknownmoon.cryforlight;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
-import android.util.Log;
 
 
 /**

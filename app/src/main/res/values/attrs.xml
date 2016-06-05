@@ -9,6 +9,7 @@
         <attr name="displayHeaderLabel" format="reference|boolean"/>
         <attr name="displayHeaderValue" format="reference|boolean"/>
         <attr name="sliderMaxValue" format="reference|integer"/>
+        <attr name="summary" format="reference|string"/>
         <attr name="headerLabelText" format="reference|string"/>
         <attr name="headerValueFormat" format="reference|string"/>
     </declare-styleable>
