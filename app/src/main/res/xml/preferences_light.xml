@@ -12,7 +12,8 @@
             android:layout="@layout/preference_slider"
             app:headerLabelText="@string/pref_light_title"
             app:headerValueFormat="@string/pref_light_value_format"
-            app:summary="@string/pref_light_summary"/>
+            app:summary="@string/pref_light_summary"
+            app:sliderMaxValue="@integer/pref_light_def_max_val"/>
 
     </PreferenceCategory>
 
