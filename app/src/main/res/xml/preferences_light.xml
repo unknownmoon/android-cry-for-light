@@ -7,13 +7,13 @@
         android:title="@string/pref_cat_light">
 
         <unknownmoon.cryforlight.SliderPreference
-            android:defaultValue="@string/pref_light_def_val"
+            android:defaultValue="@integer/pref_light_def_val"
             android:key="pref_light"
             android:layout="@layout/preference_slider"
             android:summary="@string/pref_light_summary"
             android:title="@string/pref_light_title"
-            app:headerLabelText="Brightness"
-            app:headerValueFormat="%1$d lx"/>
+            app:headerLabelText="@string/pref_light_title"
+            app:headerValueFormat="@string/pref_light_value_format"/>
 
     </PreferenceCategory>
 

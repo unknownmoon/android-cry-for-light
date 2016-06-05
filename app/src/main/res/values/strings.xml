@@ -7,7 +7,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="pref_cat_light">Light threshold</string>
+
+    <string name="pref_cat_light">Light Threshold</string>
     <string name="pref_light_title">Brightness</string>
     <string name="pref_light_summary">How dim when need to cry for light.</string>
+    <string name="pref_light_value_format">%1$d lx</string>
 </resources>
