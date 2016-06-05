@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:key="light_threshold"
+        android:title="@string/pref_cat_light">
+
+        <unknownmoon.cryforlight.SliderPreference
+            android:defaultValue="@integer/pref_light_def_val"
+            android:key="pref_light"
+            android:layout="@layout/preference_slider"
+            app:headerLabelText="@string/pref_light_title"
+            app:headerValueFormat="@string/pref_light_value_format"
+            app:summary="@string/pref_light_summary"
+            app:sliderMaxValue="@integer/pref_light_def_max_val"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

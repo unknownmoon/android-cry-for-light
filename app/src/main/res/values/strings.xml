@@ -1,4 +1,21 @@
 <resources>
     <string name="app_name">Cry for Light</string>
-    <string name="action_settings">Settings</string>∂
+    <string name="action_settings">Settings</string>
+    <string name="service_status_msg">Service %1$s.</string>
+    <string name="service_status_on">on</string>
+    <string name="service_status_off">off</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="pref_cat_light">Light Threshold</string>
+    <string name="pref_light_title">Brightness</string>
+    <string name="pref_light_summary">How dim when need to cry for light.</string>
+    <string name="pref_cat_sound">Sounds</string>
+    <string name="pref_sound_level_summary">How large the noise you prefer.</string>
+    <string name="pref_sould_level_title">Sound Level</string>
+    <string name="pref_light_value_format">%1$d lx</string>
+    <string name="pref_sould_level_value_format">%1$d</string>
+    <string name="pref_sould_file_summary">Select a audio file.</string>
+    <string name="pref_sound_file_title">Sound</string>
 </resources>
