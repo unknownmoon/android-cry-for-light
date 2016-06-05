@@ -9,4 +9,11 @@
                 tools:context="unknownmoon.cryforlight.MainActivityFragment"
                 tools:showIn="@layout/activity_main">
 
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="unknownmoon.cryforlight.SettingsLightFragment"
+        tools:layout="@layout/fragment_settings_light"
+        android:id="@+id/settings_light"/>
+
 </RelativeLayout>
