@@ -3,5 +3,5 @@
     <item android:state_activated="true"
           android:color="@color/colorAccent"/> <!-- activated -->
     <item android:state_activated="false"
-          android:color="@color/colorAccentLight"/> <!-- inactivated -->
+          android:color="@color/colorInactivated"/> <!-- inactivated -->
 </selector>
