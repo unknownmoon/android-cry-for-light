@@ -14,6 +14,13 @@
             app:headerValueFormat="@string/pref_sould_level_value_format"
             app:summary="@string/pref_sound_level_summary"/>
 
+        <RingtonePreference
+            android:key="pref_sound_file"
+            android:ringtoneType="all"
+            android:showSilent="true"
+            android:summary="@string/pref_sould_file_summary"
+            android:title="@string/pref_sound_file_title"/>
+
     </PreferenceCategory>
 
 </PreferenceScreen>
