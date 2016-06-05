@@ -96,7 +96,7 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
         super.onSetInitialValue(restorePersistedValue, defaultValue);
 
-        updateSlideValue(restorePersistedValue ? Integer.valueOf(getPersistedInt(mSliderValue))
+        updateSlideValue(restorePersistedValue ? getPersistedInt(mSliderValue)
                 : (int) defaultValue);
 
     }

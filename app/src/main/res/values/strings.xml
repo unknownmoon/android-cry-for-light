@@ -11,5 +11,9 @@
     <string name="pref_cat_light">Light Threshold</string>
     <string name="pref_light_title">Brightness</string>
     <string name="pref_light_summary">How dim when need to cry for light.</string>
+    <string name="pref_cat_sound">Sounds</string>
+    <string name="pref_sound_level_summary">How much noise you prefer.</string>
+    <string name="pref_sould_level_title">Sound Level</string>
     <string name="pref_light_value_format">%1$d lx</string>
+    <string name="pref_sould_level_value_format">%1$d</string>
 </resources>
