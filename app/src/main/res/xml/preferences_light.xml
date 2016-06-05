@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
         android:key="light_threshold"
         android:title="@string/pref_cat_light">
 
-        <EditTextPreference
-            android:key="pref_light"
+        <unknownmoon.cryforlight.SliderPreference
             android:defaultValue="@string/pref_light_def_val"
+            android:key="pref_light"
+            android:layout="@layout/preference_slider"
+            android:summary="@string/pref_light_summary"
             android:title="@string/pref_light_title"
-            android:summary="@string/pref_light_summary"/>
+            app:headerLabelText="Brightness"
+            app:headerValueFormat="%1$d lx"/>
 
     </PreferenceCategory>
 

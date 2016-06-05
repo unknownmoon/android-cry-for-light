@@ -10,10 +10,10 @@
                 tools:showIn="@layout/activity_main">
 
     <fragment
+        android:id="@+id/settings_light"
+        android:name="unknownmoon.cryforlight.SettingsLightFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:name="unknownmoon.cryforlight.SettingsLightFragment"
-        tools:layout="@layout/fragment_settings_light"
-        android:id="@+id/settings_light"/>
+        tools:layout="@layout/fragment_settings_light"/>
 
 </RelativeLayout>

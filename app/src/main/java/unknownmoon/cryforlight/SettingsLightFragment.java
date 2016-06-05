@@ -4,6 +4,7 @@ package unknownmoon.cryforlight;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.util.Log;
 
 
 /**
@@ -21,5 +22,7 @@ public class SettingsLightFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.preferences_light);
+
+        Log.d("LF:", "1");
     }
 }
