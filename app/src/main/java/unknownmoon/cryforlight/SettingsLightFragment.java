@@ -2,9 +2,11 @@ package unknownmoon.cryforlight;
 
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 
@@ -47,6 +49,14 @@ public class SettingsLightFragment extends PreferenceFragment implements SharedP
         if (key.equals("pref_light")) {
             // TODO
             Log.d("Light", String.format("%s: %d", key, sharedPreferences.getInt(key, getResources().getInteger(R.integer.pref_light_def_val))));
+            broadcastConfigChanged("pref_light");
         }
+    }
+
+    private void broadcastConfigChanged(String key) {
+        // Answer the started
+        Intent notifyStartedIntent = new Intent("on-configuration-changed");
+        notifyStartedIntent.putExtra("changedKey", key);
+        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(notifyStartedIntent);
     }
 }
