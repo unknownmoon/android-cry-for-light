@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:key="sounds"
+        android:title="@string/pref_cat_sound">
+
+        <unknownmoon.cryforlight.SliderPreference
+            android:defaultValue="@integer/pref_sound_level_def_val"
+            android:key="pref_sound_level"
+            android:layout="@layout/preference_slider"
+            app:headerLabelText="@string/pref_sould_level_title"
+            app:headerValueFormat="@string/pref_sould_level_value_format"
+            app:summary="@string/pref_sound_level_summary"/>
+
+        <RingtonePreference
+            android:key="pref_sound_file"
+            android:ringtoneType="all"
+            android:showSilent="true"
+            android:summary="@string/pref_sould_file_summary"
+            android:title="@string/pref_sound_file_title"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

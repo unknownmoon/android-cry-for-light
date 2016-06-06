@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="pref_light_def_val">0</integer>
+    <integer name="pref_sound_level_def_val">30</integer>
+    <integer name="pref_light_def_max_val">333</integer>
+</resources>

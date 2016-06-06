@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CustomPreferenceStyle">
+        <attr name="sliderPreferenceStyle" format="reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="SliderPreference">
+        <attr name="displayHeaderLabel" format="reference|boolean"/>
+        <attr name="displayHeaderValue" format="reference|boolean"/>
+        <attr name="sliderMaxValue" format="reference|integer"/>
+        <attr name="summary" format="reference|string"/>
+        <attr name="headerLabelText" format="reference|string"/>
+        <attr name="headerValueFormat" format="reference|string"/>
+    </declare-styleable>
+
+</resources>
