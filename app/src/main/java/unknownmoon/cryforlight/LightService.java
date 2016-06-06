@@ -3,7 +3,12 @@ package unknownmoon.cryforlight;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -11,12 +16,14 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.widget.Toast;
 
 public class LightService extends Service {
     private final int NOTIFICATION_ID = 1;
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
+    private SensorHandler mSensorHandler;
     private Notification.Builder mBuilder;
     private Toast mToast = null;
 
@@ -61,6 +68,20 @@ public class LightService extends Service {
 //                .setSound(Uri.parse("content://media/internal/audio/media/29")) // TODO
                 .setContentIntent(pendingIntent);
 
+        SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        Sensor lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+
+        // check sensor available in devise. if available then get reading
+        if (lightSensor == null) {
+            showMsg("No light sensor :(", Toast.LENGTH_SHORT);
+        } else {
+            float max = lightSensor.getMaximumRange();
+            mSensorHandler = new SensorHandler();
+            sensorManager.registerListener(mSensorHandler,
+                    lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        }
+
         startForeground(NOTIFICATION_ID, mBuilder.build());
 
         broadcastStarted();
@@ -90,6 +111,11 @@ public class LightService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
+        if (mSensorHandler != null) {
+            SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+            sensorManager.unregisterListener(mSensorHandler);
+        }
+
         showMsg("Service off", Toast.LENGTH_SHORT);
         broadcastStopped();
     }
@@ -117,6 +143,23 @@ public class LightService extends Service {
         public void handleMessage(Message msg) {
             showMsg("Service on", Toast.LENGTH_SHORT);
 //            stopSelf(msg.arg1);
+        }
+    }
+
+    private final class SensorHandler implements SensorEventListener {
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
+                float currentReading = event.values[0];
+
+                Log.d("L", String.valueOf(currentReading));
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
         }
     }
 }
