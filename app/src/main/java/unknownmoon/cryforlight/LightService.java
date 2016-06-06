@@ -223,7 +223,8 @@ public class LightService extends Service {
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         int maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_RING);
-        int curVol = Math.round(maxVol * mPrefSoundLevel / 100);
+        // never mute till set to 0;
+        int curVol = mPrefSoundLevel == 0 ? 0 : Math.max(Math.round(maxVol * mPrefSoundLevel / 100), 1);
 
         audioManager.setStreamVolume(AudioManager.STREAM_RING, curVol, 0);
     }
