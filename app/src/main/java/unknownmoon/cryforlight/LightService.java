@@ -12,11 +12,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.Message;
 import android.os.Process;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -27,14 +25,13 @@ public class LightService extends Service {
     private final int NOTIFICATION_ID = 1;
     protected BroadcastReceiver mMessageReceiver;
     private Looper mServiceLooper;
-    private ServiceHandler mServiceHandler;
     private SensorHandler mSensorHandler;
     private Notification.Builder mBuilder;
     private Toast mToast = null;
     private int mPrefSoundLevel;
     private String mPrefSoundFile;
     private int mPrefLightThreshold;
-    private Boolean mIsCrying;
+    private Boolean mIsCrying = false;
 
     public LightService() {
     }
@@ -51,11 +48,6 @@ public class LightService extends Service {
                 Process.THREAD_PRIORITY_FOREGROUND);
         thread.start();
 
-        // Get the HandlerThread's Looper and use it for our Handler
-        mServiceLooper = thread.getLooper();
-        mServiceHandler = new ServiceHandler(mServiceLooper);
-
-
         mMessageReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, final Intent intent) {
@@ -70,12 +62,6 @@ public class LightService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        // For each start request, send a message to start a job and deliver the
-        // start ID so we know which request we're stopping when we finish the job
-        Message msg = mServiceHandler.obtainMessage();
-        msg.arg1 = startId;
-        mServiceHandler.sendMessage(msg);
 
         mBuilder = new Notification.Builder(getApplicationContext());
 
@@ -109,8 +95,7 @@ public class LightService extends Service {
 
         broadcastStarted();
 
-        // If we get killed, after returning from here, restart
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     protected void showMsg(String msg, int duration) {
@@ -195,18 +180,6 @@ public class LightService extends Service {
     private void updateLightThreshold(int lvl) {
         mPrefLightThreshold = lvl;
         Log.d("sync", "light - " + lvl);
-    }
-
-    private final class ServiceHandler extends Handler {
-        public ServiceHandler(Looper looper) {
-            super(looper);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            showMsg("Service on", Toast.LENGTH_SHORT);
-//            stopSelf(msg.arg1);
-        }
     }
 
     private final class SensorHandler implements SensorEventListener {
