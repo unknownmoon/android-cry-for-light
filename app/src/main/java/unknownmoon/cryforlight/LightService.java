@@ -38,6 +38,7 @@ public class LightService extends Service {
     private float mLastBrightness;
     private Boolean mIsCrying = false;
     private Ringtone mRingtone;
+    private int mOriginalVol;
 
     public LightService() {
     }
@@ -68,6 +69,10 @@ public class LightService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        mOriginalVol = audioManager.getStreamVolume(AudioManager.STREAM_RING);
 
         mBuilder = new Notification.Builder(getApplicationContext());
 
@@ -178,13 +183,13 @@ public class LightService extends Service {
     private void updateSoundLevel(int lvl) {
         mPrefSoundLevel = lvl;
         updateRingtone();
-        Log.d("sync", "sound_level - " + lvl);
+        Log.d("CFL", "sound_level - " + lvl);
     }
 
     private void updateSoundFile(String path) {
         mPrefSoundFile = path;
         updateRingtone();
-        Log.d("sync", "sound_file - " + path);
+        Log.d("CFL", "sound_file - " + path);
     }
 
     private void updateRingtone() {
@@ -210,29 +215,36 @@ public class LightService extends Service {
         if (mRingtone != null && mRingtone.isPlaying()) {
             mRingtone.stop();
         }
+        resetVol();
     }
 
     private void setupRingtone() {
 
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-        int maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
+        int maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_RING);
         int curVol = Math.round(maxVol * mPrefSoundLevel / 100);
 
-        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, curVol, 0);
+        audioManager.setStreamVolume(AudioManager.STREAM_RING, curVol, 0);
+    }
+
+    private void resetVol() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        Log.d("CFL", "Original volume: " + mOriginalVol);
+        audioManager.setStreamVolume(AudioManager.STREAM_RING, mOriginalVol, 0);
     }
 
     private void updateLightThreshold(int lvl) {
         mPrefLightThreshold = lvl;
         shouldWeCry();
-        Log.d("sync", "light - " + lvl);
+        Log.d("CFL", "light - " + lvl);
     }
 
     private void shouldWeCry() {
         if (mLastBrightness < mPrefLightThreshold && !mIsCrying) {
 
             mIsCrying = true;
-            Log.d("func", "I'm crying!!!");
+            Log.d("CFL", "I'm crying!!!");
 
             if (mRingtone != null) {
                 mRingtone.play();
@@ -241,7 +253,7 @@ public class LightService extends Service {
         } else if (mLastBrightness >= mPrefLightThreshold && mIsCrying) {
 
             mIsCrying = false;
-            Log.d("func", "Now I'm fine...");
+            Log.d("CFL", "Now I'm fine...");
 
             if (mRingtone != null && mRingtone.isPlaying()) {
                 mRingtone.stop();
@@ -256,7 +268,7 @@ public class LightService extends Service {
             if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
                 mLastBrightness = event.values[0];
 
-                Log.d("L", String.valueOf(mLastBrightness));
+                Log.d("CFL", String.valueOf(mLastBrightness));
                 shouldWeCry();
             }
         }
