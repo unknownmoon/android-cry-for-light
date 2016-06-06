@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.preference.Preference;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -24,7 +25,6 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
     private String mHeaderValueFormat;
     private int mSliderMax;
     private int mSliderValue;
-    private TextView mHeaderValueView;
 
     public SliderPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
@@ -61,7 +61,7 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
         SeekBar seekBarView = (SeekBar) view.findViewById(R.id.pref_seek_bar);
         TextView headerLabelView = (TextView) view.findViewById(R.id.pref_header_label);
         TextView summaryView = (TextView) view.findViewById(R.id.pref_summary);
-        mHeaderValueView = (TextView) view.findViewById(R.id.pref_header_value);
+        TextView headerValueView = (TextView) view.findViewById(R.id.pref_header_value);
 
         if (seekBarView != null) {
 
@@ -82,14 +82,14 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
             }
         }
 
-        if (mHeaderValueView != null) {
+        if (headerValueView != null) {
 
-            updateHeaderValueText(mSliderValue);
+            updateHeaderValueText(headerValueView, mSliderValue);
 
             if (mDisplayHeaderValue) {
-                mHeaderValueView.setVisibility(View.VISIBLE);
+                headerValueView.setVisibility(View.VISIBLE);
             } else {
-                mHeaderValueView.setVisibility(View.INVISIBLE);
+                headerValueView.setVisibility(View.INVISIBLE);
             }
         }
 
@@ -112,8 +112,10 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
 
     }
 
-    private void updateHeaderValueText(int value) {
-        mHeaderValueView.setText(String.format(mHeaderValueFormat, value));
+    private void updateHeaderValueText(TextView v, int value) {
+        if (v != null) {
+            v.setText(String.format(mHeaderValueFormat, value));
+        }
     }
 
     private void updateSlideValue(int newValue) {
@@ -126,9 +128,9 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        TextView headerValueView = (TextView) getView(null, (ViewGroup) seekBar.getParent()).findViewById(R.id.pref_header_value);
         updateSlideValue(progress);
-
-        updateHeaderValueText(progress);
+        updateHeaderValueText(headerValueView, progress);
     }
 
     @Override
