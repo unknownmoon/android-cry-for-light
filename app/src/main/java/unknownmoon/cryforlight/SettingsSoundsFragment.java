@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 
@@ -49,9 +50,7 @@ public class SettingsSoundsFragment extends PreferenceFragment implements Shared
         if (key.equals("pref_sound_level")) {
             // TODO
             Log.d("Sound L", String.format("%s: %d", key, sharedPreferences.getInt(key, getResources().getInteger(R.integer.pref_sound_level_def_val))));
-        } else if (key.equals("pref_sound_file")) {
-            // TODO
-            Log.d("Sound F", sharedPreferences.getString(key, "Not found."));
+            broadcastConfigChanged("pref_sound_level");
         }
     }
 
@@ -61,9 +60,17 @@ public class SettingsSoundsFragment extends PreferenceFragment implements Shared
 
         try {
             Log.d("Sound P", String.format("REQ: %d\nRES: %d\nDATA: %s", requestCode, resultCode, data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI).toString()));
+            broadcastConfigChanged("pref_sound_file");
         } catch (Exception e) {
             // simply ignore for the moment.
             Log.d("Sound P", String.format("REQ: %d\nRES: %d", requestCode, resultCode));
         }
+    }
+
+    private void broadcastConfigChanged(String key) {
+        // Answer the started
+        Intent notifyStartedIntent = new Intent("on-configuration-changed");
+        notifyStartedIntent.putExtra("changedKey", key);
+        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(notifyStartedIntent);
     }
 }

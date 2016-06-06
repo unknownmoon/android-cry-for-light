@@ -3,8 +3,10 @@ package unknownmoon.cryforlight;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -21,6 +23,7 @@ import android.widget.Toast;
 
 public class LightService extends Service {
     private final int NOTIFICATION_ID = 1;
+    protected BroadcastReceiver mMessageReceiver;
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
     private SensorHandler mSensorHandler;
@@ -45,6 +48,19 @@ public class LightService extends Service {
         // Get the HandlerThread's Looper and use it for our Handler
         mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
+
+
+        mMessageReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, final Intent intent) {
+                String changedKey = intent.getStringExtra("changedKey");
+
+                Log.d("Key", changedKey);
+            }
+        };
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter("on-configuration-changed"));
     }
 
     @Override
@@ -115,6 +131,7 @@ public class LightService extends Service {
             SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             sensorManager.unregisterListener(mSensorHandler);
         }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
 
         showMsg("Service off", Toast.LENGTH_SHORT);
         broadcastStopped();
