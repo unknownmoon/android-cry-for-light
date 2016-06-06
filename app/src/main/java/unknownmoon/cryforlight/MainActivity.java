@@ -1,5 +1,6 @@
 package unknownmoon.cryforlight;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,9 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     private Boolean mIsServiceOn = false;
     private Toast mToast = null;
+
+    public MainActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,19 +31,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void onServiceButtonToggled(View view) {
         mIsServiceOn = !mIsServiceOn;
-        String msgStatus = getString(R.string.service_status_off);
+        Intent intent = new Intent(this, LightService.class);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setActivated(mIsServiceOn);
 
         if (mIsServiceOn) {
-            msgStatus = getString(R.string.service_status_on);
+            startService(intent);
+        } else {
+            stopService(intent);
         }
 
-        showMsg(getString(R.string.service_status_msg, msgStatus), Toast.LENGTH_SHORT);
-
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
     }
 
     protected void showMsg(String msg, int duration) {
