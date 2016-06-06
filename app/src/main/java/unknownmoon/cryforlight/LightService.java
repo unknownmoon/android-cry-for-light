@@ -12,6 +12,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
@@ -31,7 +35,10 @@ public class LightService extends Service {
     private int mPrefSoundLevel;
     private String mPrefSoundFile;
     private int mPrefLightThreshold;
+    private float mLastBrightness;
     private Boolean mIsCrying = false;
+    private Ringtone mRingtone;
+    private int mOriginalVol;
 
     public LightService() {
     }
@@ -62,6 +69,10 @@ public class LightService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        mOriginalVol = audioManager.getStreamVolume(AudioManager.STREAM_RING);
 
         mBuilder = new Notification.Builder(getApplicationContext());
 
@@ -119,6 +130,8 @@ public class LightService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
+        stopRingtone();
+
         if (mSensorHandler != null) {
             SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             sensorManager.unregisterListener(mSensorHandler);
@@ -169,17 +182,84 @@ public class LightService extends Service {
 
     private void updateSoundLevel(int lvl) {
         mPrefSoundLevel = lvl;
-        Log.d("sync", "sound_level - " + lvl);
+        updateRingtone();
+        Log.d("CFL", "sound_level - " + lvl);
     }
 
     private void updateSoundFile(String path) {
         mPrefSoundFile = path;
-        Log.d("sync", "sound_file - " + path);
+        updateRingtone();
+        Log.d("CFL", "sound_file - " + path);
+    }
+
+    private void updateRingtone() {
+        if (mPrefSoundFile != null && mPrefSoundFile.length() > 0) {
+
+            Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), Uri.parse(mPrefSoundFile));
+
+            if (ringtone != null) {
+                stopRingtone();
+
+                mRingtone = ringtone;
+
+                setupRingtone();
+
+                if (mIsCrying) {
+                    mRingtone.play();
+                }
+            }
+        }
+    }
+
+    private void stopRingtone() {
+        if (mRingtone != null && mRingtone.isPlaying()) {
+            mRingtone.stop();
+        }
+        resetVol();
+    }
+
+    private void setupRingtone() {
+
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        int maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_RING);
+        // never mute till set to 0;
+        int curVol = mPrefSoundLevel == 0 ? 0 : Math.max(Math.round(maxVol * mPrefSoundLevel / 100), 1);
+
+        audioManager.setStreamVolume(AudioManager.STREAM_RING, curVol, 0);
+    }
+
+    private void resetVol() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        Log.d("CFL", "Original volume: " + mOriginalVol);
+        audioManager.setStreamVolume(AudioManager.STREAM_RING, mOriginalVol, 0);
     }
 
     private void updateLightThreshold(int lvl) {
         mPrefLightThreshold = lvl;
-        Log.d("sync", "light - " + lvl);
+        shouldWeCry();
+        Log.d("CFL", "light - " + lvl);
+    }
+
+    private void shouldWeCry() {
+        if (mLastBrightness < mPrefLightThreshold && !mIsCrying) {
+
+            mIsCrying = true;
+            Log.d("CFL", "I'm crying!!!");
+
+            if (mRingtone != null) {
+                mRingtone.play();
+            }
+
+        } else if (mLastBrightness >= mPrefLightThreshold && mIsCrying) {
+
+            mIsCrying = false;
+            Log.d("CFL", "Now I'm fine...");
+
+            if (mRingtone != null && mRingtone.isPlaying()) {
+                mRingtone.stop();
+            }
+        }
     }
 
     private final class SensorHandler implements SensorEventListener {
@@ -187,19 +267,10 @@ public class LightService extends Service {
         @Override
         public void onSensorChanged(SensorEvent event) {
             if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-                float currentReading = event.values[0];
+                mLastBrightness = event.values[0];
 
-                Log.d("L", String.valueOf(currentReading));
-                if (currentReading < mPrefLightThreshold && !mIsCrying) {
-
-                    mIsCrying = true;
-                    Log.d("func", "I'm crying!!!");
-
-                } else if (currentReading >= mPrefLightThreshold && mIsCrying) {
-
-                    mIsCrying = false;
-                    Log.d("func", "Now I'm fine...");
-                }
+                Log.d("CFL", String.valueOf(mLastBrightness));
+                shouldWeCry();
             }
         }
 
