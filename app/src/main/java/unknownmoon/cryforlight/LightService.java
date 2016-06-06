@@ -242,7 +242,7 @@ public class LightService extends Service {
     }
 
     private void shouldWeCry() {
-        if (mLastBrightness < mPrefLightThreshold && !mIsCrying) {
+        if (mLastBrightness <= mPrefLightThreshold && !mIsCrying) {
 
             mIsCrying = true;
             Log.d("CFL", "I'm crying!!!");
@@ -251,7 +251,7 @@ public class LightService extends Service {
                 mRingtone.play();
             }
 
-        } else if (mLastBrightness >= mPrefLightThreshold && mIsCrying) {
+        } else if (mLastBrightness > mPrefLightThreshold && mIsCrying) {
 
             mIsCrying = false;
             Log.d("CFL", "Now I'm fine...");
