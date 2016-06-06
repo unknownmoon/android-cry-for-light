@@ -12,6 +12,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
@@ -31,7 +35,9 @@ public class LightService extends Service {
     private int mPrefSoundLevel;
     private String mPrefSoundFile;
     private int mPrefLightThreshold;
+    private float mLastBrightness;
     private Boolean mIsCrying = false;
+    private Ringtone mRingtone;
 
     public LightService() {
     }
@@ -119,6 +125,8 @@ public class LightService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
+        stopRingtone();
+
         if (mSensorHandler != null) {
             SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             sensorManager.unregisterListener(mSensorHandler);
@@ -169,17 +177,76 @@ public class LightService extends Service {
 
     private void updateSoundLevel(int lvl) {
         mPrefSoundLevel = lvl;
+        updateRingtone();
         Log.d("sync", "sound_level - " + lvl);
     }
 
     private void updateSoundFile(String path) {
         mPrefSoundFile = path;
+        updateRingtone();
         Log.d("sync", "sound_file - " + path);
+    }
+
+    private void updateRingtone() {
+        if (mPrefSoundFile != null && mPrefSoundFile.length() > 0) {
+
+            Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), Uri.parse(mPrefSoundFile));
+
+            if (ringtone != null) {
+                stopRingtone();
+
+                mRingtone = ringtone;
+
+                setupRingtone();
+
+                if (mIsCrying) {
+                    mRingtone.play();
+                }
+            }
+        }
+    }
+
+    private void stopRingtone() {
+        if (mRingtone != null && mRingtone.isPlaying()) {
+            mRingtone.stop();
+        }
+    }
+
+    private void setupRingtone() {
+
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        int maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
+        int curVol = Math.round(maxVol * mPrefSoundLevel / 100);
+
+        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, curVol, 0);
     }
 
     private void updateLightThreshold(int lvl) {
         mPrefLightThreshold = lvl;
+        shouldWeCry();
         Log.d("sync", "light - " + lvl);
+    }
+
+    private void shouldWeCry() {
+        if (mLastBrightness < mPrefLightThreshold && !mIsCrying) {
+
+            mIsCrying = true;
+            Log.d("func", "I'm crying!!!");
+
+            if (mRingtone != null) {
+                mRingtone.play();
+            }
+
+        } else if (mLastBrightness >= mPrefLightThreshold && mIsCrying) {
+
+            mIsCrying = false;
+            Log.d("func", "Now I'm fine...");
+
+            if (mRingtone != null && mRingtone.isPlaying()) {
+                mRingtone.stop();
+            }
+        }
     }
 
     private final class SensorHandler implements SensorEventListener {
@@ -187,19 +254,10 @@ public class LightService extends Service {
         @Override
         public void onSensorChanged(SensorEvent event) {
             if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-                float currentReading = event.values[0];
+                mLastBrightness = event.values[0];
 
-                Log.d("L", String.valueOf(currentReading));
-                if (currentReading < mPrefLightThreshold && !mIsCrying) {
-
-                    mIsCrying = true;
-                    Log.d("func", "I'm crying!!!");
-
-                } else if (currentReading >= mPrefLightThreshold && mIsCrying) {
-
-                    mIsCrying = false;
-                    Log.d("func", "Now I'm fine...");
-                }
+                Log.d("L", String.valueOf(mLastBrightness));
+                shouldWeCry();
             }
         }
 
