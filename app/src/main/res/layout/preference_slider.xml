@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
               android:id="@+id/pref_slider"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -16,21 +17,28 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="8dp"
             android:paddingEnd="16dp"
             android:paddingStart="16dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:textAppearance="?android:attr/textAppearanceListItem"
+            tools:text="Brightness"
+            android:paddingTop="16dp"
+            />
 
         <TextView
             android:id="@+id/pref_header_value"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="8dp"
             android:paddingEnd="16dp"
             android:paddingStart="16dp"
             android:textAlignment="viewEnd"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:textAppearance="?android:attr/textAppearanceListItem"
+            tools:text="20000 lx"
+            android:paddingTop="16dp"/>
 
     </LinearLayout>
 
@@ -42,7 +50,10 @@
         android:padding="0dp"
         android:paddingEnd="16dp"
         android:paddingStart="16dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"/>
+        android:textAppearance="?android:attr/textAppearanceListItemSecondary"
+        android:textColor="?android:attr/textColorSecondary"
+        android:maxLines="10"
+        tools:text="Long description. Long description. Long description. Long description. Long description. Long description. Long description."/>
 
     <SeekBar
         android:id="@+id/pref_seek_bar"
