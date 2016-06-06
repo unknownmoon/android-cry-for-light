@@ -1,5 +1,7 @@
 package unknownmoon.cryforlight;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
@@ -11,8 +13,11 @@ import android.os.Process;
 import android.widget.Toast;
 
 public class LightService extends Service {
+    private final int NOTIFICATION_ID = 1;
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
+    private Notification.Builder mBuilder;
+    private Toast mToast = null;
 
     public LightService() {
     }
@@ -36,7 +41,6 @@ public class LightService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "Service on", Toast.LENGTH_SHORT).show();
 
         // For each start request, send a message to start a job and deliver the
         // start ID so we know which request we're stopping when we finish the job
@@ -44,8 +48,33 @@ public class LightService extends Service {
         msg.arg1 = startId;
         mServiceHandler.sendMessage(msg);
 
+        mBuilder = new Notification.Builder(getApplicationContext());
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Cry for Light is on!")
+                .setContentText("Let's keep the light on!")
+                .setAutoCancel(true)
+//                .setSound(Uri.parse("content://media/internal/audio/media/29")) // TODO
+                .setContentIntent(pendingIntent);
+
+        startForeground(NOTIFICATION_ID, mBuilder.build());
+
         // If we get killed, after returning from here, restart
         return START_STICKY;
+    }
+
+    protected void showMsg(String msg, int duration) {
+        if (mToast != null) {
+
+            // dismiss the previous message if exists.
+            mToast.cancel();
+        }
+
+        mToast = Toast.makeText(getApplicationContext(), msg, duration);
+        mToast.show();
     }
 
     @Override
@@ -58,7 +87,7 @@ public class LightService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        Toast.makeText(this, "Service off", Toast.LENGTH_SHORT).show();
+        showMsg("Service off", Toast.LENGTH_SHORT);
     }
 
     private final class ServiceHandler extends Handler {
@@ -68,18 +97,8 @@ public class LightService extends Service {
 
         @Override
         public void handleMessage(Message msg) {
-            // Normally we would do some work here, like download a file.
-            // For our sample, we just sleep for 5 seconds.
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                // Restore interrupt status.
-                Thread.currentThread().interrupt();
-            }
-            // Stop the service using the startId, so that we don't stop
-            // the service in the middle of handling another job
+            showMsg("Service on", Toast.LENGTH_SHORT);
 //            stopSelf(msg.arg1);
-            Toast.makeText(getApplicationContext(), "Got a message.", Toast.LENGTH_SHORT).show();
         }
     }
 }
