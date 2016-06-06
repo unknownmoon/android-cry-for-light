@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -17,6 +18,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -29,6 +31,10 @@ public class LightService extends Service {
     private SensorHandler mSensorHandler;
     private Notification.Builder mBuilder;
     private Toast mToast = null;
+    private int mPrefSoundLevel;
+    private String mPrefSoundFile;
+    private int mPrefLightThreshold;
+    private Boolean mIsCrying;
 
     public LightService() {
     }
@@ -54,8 +60,7 @@ public class LightService extends Service {
             @Override
             public void onReceive(Context context, final Intent intent) {
                 String changedKey = intent.getStringExtra("changedKey");
-
-                Log.d("Key", changedKey);
+                syncPref(changedKey);
             }
         };
 
@@ -91,12 +96,14 @@ public class LightService extends Service {
         if (lightSensor == null) {
             showMsg("No light sensor :(", Toast.LENGTH_SHORT);
         } else {
-            float max = lightSensor.getMaximumRange();
+
             mSensorHandler = new SensorHandler();
             sensorManager.registerListener(mSensorHandler,
                     lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         }
+
+        syncPrefs();
 
         startForeground(NOTIFICATION_ID, mBuilder.build());
 
@@ -151,6 +158,45 @@ public class LightService extends Service {
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(notifyStoppedIntent);
     }
 
+    private void syncPrefs() {
+        syncPref("pref_light");
+        syncPref("pref_sound_level");
+        syncPref("pref_sound_file");
+    }
+
+    private void syncPref(String key) {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        switch (key) {
+            case "pref_light":
+                updateLightThreshold(sharedPrefs.getInt(key, mPrefLightThreshold));
+                break;
+            case "pref_sound_level":
+                updateSoundLevel(sharedPrefs.getInt(key, mPrefSoundLevel));
+                break;
+            case "pref_sound_file":
+                updateSoundFile(sharedPrefs.getString(key, mPrefSoundFile));
+                break;
+            default:
+                Log.d("sync", key);
+        }
+    }
+
+    private void updateSoundLevel(int lvl) {
+        mPrefSoundLevel = lvl;
+        Log.d("sync", "sound_level - " + lvl);
+    }
+
+    private void updateSoundFile(String path) {
+        mPrefSoundFile = path;
+        Log.d("sync", "sound_file - " + path);
+    }
+
+    private void updateLightThreshold(int lvl) {
+        mPrefLightThreshold = lvl;
+        Log.d("sync", "light - " + lvl);
+    }
+
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
             super(looper);
@@ -171,6 +217,16 @@ public class LightService extends Service {
                 float currentReading = event.values[0];
 
                 Log.d("L", String.valueOf(currentReading));
+                if (currentReading < mPrefLightThreshold && !mIsCrying) {
+
+                    mIsCrying = true;
+                    Log.d("func", "I'm crying!!!");
+
+                } else if (currentReading >= mPrefLightThreshold && mIsCrying) {
+
+                    mIsCrying = false;
+                    Log.d("func", "Now I'm fine...");
+                }
             }
         }
 
