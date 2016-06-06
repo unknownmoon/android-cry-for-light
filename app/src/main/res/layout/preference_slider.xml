@@ -17,13 +17,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:ellipsize="marquee"
             android:paddingEnd="16dp"
             android:paddingStart="16dp"
+            android:paddingTop="16dp"
             android:singleLine="true"
-            android:ellipsize="marquee"
             android:textAppearance="?android:attr/textAppearanceListItem"
             tools:text="Brightness"
-            android:paddingTop="16dp"
             />
 
         <TextView
@@ -31,14 +31,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:ellipsize="marquee"
             android:paddingEnd="16dp"
             android:paddingStart="16dp"
-            android:textAlignment="viewEnd"
+            android:paddingTop="16dp"
             android:singleLine="true"
-            android:ellipsize="marquee"
+            android:textAlignment="viewEnd"
             android:textAppearance="?android:attr/textAppearanceListItem"
-            tools:text="20000 lx"
-            android:paddingTop="16dp"/>
+            tools:text="20000 lx"/>
 
     </LinearLayout>
 
@@ -47,12 +47,12 @@
         android:id="@+id/pref_summary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:maxLines="10"
         android:padding="0dp"
         android:paddingEnd="16dp"
         android:paddingStart="16dp"
         android:textAppearance="?android:attr/textAppearanceListItemSecondary"
         android:textColor="?android:attr/textColorSecondary"
-        android:maxLines="10"
         tools:text="Long description. Long description. Long description. Long description. Long description. Long description. Long description."/>
 
     <SeekBar

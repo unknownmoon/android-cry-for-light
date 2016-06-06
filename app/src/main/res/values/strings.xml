@@ -18,4 +18,6 @@
     <string name="pref_sould_level_value_format">%1$d</string>
     <string name="pref_sould_file_summary">Select a audio file.</string>
     <string name="pref_sound_file_title">Sound</string>
+    <string name="current_brightness_header">Current Info</string>
+    <string name="current_brightness_value_format">%1$.2f lx</string>
 </resources>
