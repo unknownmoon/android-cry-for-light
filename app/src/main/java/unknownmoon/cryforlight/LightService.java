@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
+import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 public class LightService extends Service {
@@ -62,6 +63,8 @@ public class LightService extends Service {
 
         startForeground(NOTIFICATION_ID, mBuilder.build());
 
+        broadcastStarted();
+
         // If we get killed, after returning from here, restart
         return START_STICKY;
     }
@@ -88,6 +91,21 @@ public class LightService extends Service {
         super.onDestroy();
 
         showMsg("Service off", Toast.LENGTH_SHORT);
+        broadcastStopped();
+    }
+
+    private void broadcastStarted() {
+        // Answer the started
+        Intent notifyStartedIntent = new Intent("from-service");
+        notifyStartedIntent.putExtra("SERVICE_STARTED", true);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(notifyStartedIntent);
+    }
+
+    private void broadcastStopped() {
+        // Answer the started
+        Intent notifyStoppedIntent = new Intent("from-service");
+        notifyStoppedIntent.putExtra("SERVICE_STARTED", false);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(notifyStoppedIntent);
     }
 
     private final class ServiceHandler extends Handler {
