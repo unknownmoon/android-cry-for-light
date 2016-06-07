@@ -108,7 +108,7 @@ public class LightService extends Service {
 
         broadcastStarted();
 
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     protected void showMsg(String msg, int duration) {
