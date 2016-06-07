@@ -18,7 +18,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Looper;
+import android.os.PowerManager;
 import android.os.Process;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -26,11 +26,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class LightService extends Service {
+    private final String TAG = "CFL";
     private final int NOTIFICATION_ID = 1;
     protected BroadcastReceiver mMessageReceiver;
-    private Looper mServiceLooper;
     private SensorHandler mSensorHandler;
-    private Notification.Builder mBuilder;
     private Toast mToast = null;
     private int mPrefSoundLevel;
     private String mPrefSoundFile;
@@ -39,6 +38,7 @@ public class LightService extends Service {
     private Boolean mIsCrying = false;
     private Ringtone mRingtone;
     private int mOriginalVol;
+    private PowerManager.WakeLock mWakeLock;
 
     public LightService() {
     }
@@ -65,6 +65,8 @@ public class LightService extends Service {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("on-configuration-changed"));
+
+        acquireWakeLock();
     }
 
     @Override
@@ -74,7 +76,7 @@ public class LightService extends Service {
 
         mOriginalVol = audioManager.getStreamVolume(AudioManager.STREAM_RING);
 
-        mBuilder = new Notification.Builder(getApplicationContext());
+        Notification.Builder mBuilder = new Notification.Builder(getApplicationContext());
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -106,7 +108,7 @@ public class LightService extends Service {
 
         broadcastStarted();
 
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     protected void showMsg(String msg, int duration) {
@@ -137,6 +139,8 @@ public class LightService extends Service {
             sensorManager.unregisterListener(mSensorHandler);
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+
+        releaseWakeLock();
 
         showMsg("Service off", Toast.LENGTH_SHORT);
         broadcastStopped();
@@ -183,13 +187,13 @@ public class LightService extends Service {
     private void updateSoundLevel(int lvl) {
         mPrefSoundLevel = lvl;
         updateRingtone();
-        Log.d("CFL", "sound_level - " + lvl);
+        Log.d(TAG, "sound_level - " + lvl);
     }
 
     private void updateSoundFile(String path) {
         mPrefSoundFile = path;
         updateRingtone();
-        Log.d("CFL", "sound_file - " + path);
+        Log.d(TAG, "sound_file - " + path);
     }
 
     private void updateRingtone() {
@@ -231,21 +235,21 @@ public class LightService extends Service {
 
     private void resetVol() {
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        Log.d("CFL", "Original volume: " + mOriginalVol);
+        Log.d(TAG, "Original volume: " + mOriginalVol);
         audioManager.setStreamVolume(AudioManager.STREAM_RING, mOriginalVol, 0);
     }
 
     private void updateLightThreshold(int lvl) {
         mPrefLightThreshold = lvl;
         shouldWeCry();
-        Log.d("CFL", "light - " + lvl);
+        Log.d(TAG, "light - " + lvl);
     }
 
     private void shouldWeCry() {
         if (mLastBrightness <= mPrefLightThreshold && !mIsCrying) {
 
             mIsCrying = true;
-            Log.d("CFL", "I'm crying!!!");
+            Log.d(TAG, "I'm crying!!!");
 
             if (mRingtone != null) {
                 mRingtone.play();
@@ -254,11 +258,24 @@ public class LightService extends Service {
         } else if (mLastBrightness > mPrefLightThreshold && mIsCrying) {
 
             mIsCrying = false;
-            Log.d("CFL", "Now I'm fine...");
+            Log.d(TAG, "Now I'm fine...");
 
             if (mRingtone != null && mRingtone.isPlaying()) {
                 mRingtone.stop();
             }
+        }
+    }
+
+    private void acquireWakeLock() {
+        releaseWakeLock();
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+        mWakeLock.acquire();
+    }
+
+    private void releaseWakeLock() {
+        if (mWakeLock != null) {
+            mWakeLock.release();
         }
     }
 
@@ -269,7 +286,7 @@ public class LightService extends Service {
             if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
                 mLastBrightness = event.values[0];
 
-                Log.d("CFL", String.valueOf(mLastBrightness));
+                Log.d(TAG, String.valueOf(mLastBrightness));
                 shouldWeCry();
             }
         }

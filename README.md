@@ -30,20 +30,20 @@ This app is then used to keep the lights on, by taking advantage of the sensors 
 <a name="feature-level---core"></a>
 ### Feature Level - Core
 
- - [ ] When the environment luminance is lower than a configurable threshold, a _trigger sound_ will be played continuously till the environment luminance is back above the threshold.
+ - [x] When the environment luminance is lower than a configurable threshold, a _trigger sound_ will be played continuously till the environment luminance is back above the threshold.
 
 <a name="feature-level---basic"></a>
 ### Feature Level - Basic
 
- - [ ] The core features are functional when the APP is active.
- - [ ] Display the current luminance information for referencing to.
- - [ ] The threshold can be configured easily configured by using slider.
- - [ ] The _trigger sound_ can be selected from the system storage.
+ - [x] The core features are functional when the APP is active.
+ - [x] Display the current luminance information for referencing to.
+ - [x] The threshold can be configured easily configured by using slider.
+ - [x] The _trigger sound_ can be selected from the system storage.
 
 <a name="feature-level---enhancement"></a>
 ### Feature Level - Enhancement
 
- - [ ] Features are functional when the APP is running either foreground or background.
+ - [x] Features are functional when the APP is running either foreground or background.
  - [ ] `Trigger sound generator` can provide a range of sounds in different frequencies.
    - [ ] Controlled by sliders.
    - [ ] With a set of pre-set frequencies.
@@ -51,6 +51,6 @@ This app is then used to keep the lights on, by taking advantage of the sensors 
 <a name="feature-level---advanced"></a>
 ### Feature Level - Advanced
 
- - [ ] The APP is running as a background service, and displayed in the notification bar when running.
+ - [x] The APP is running as a background service, and displayed in the notification bar when running.
  - [ ] The user can `pause`/`resume`/`stop` the service in the notification bar directly, while `stop` also stop the background service.
  - [ ] Automatically stare/stop service by sensing the user behaviours: pick up to stop, hand off to start (after 2 seconds delay perhaps).
