@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
 
                 FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
                 fab.setActivated(mIsServiceOn);
+
+                showMsg("Service On", Toast.LENGTH_SHORT);
             }
         };
 
