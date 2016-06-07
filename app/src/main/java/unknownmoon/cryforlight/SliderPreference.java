@@ -11,6 +11,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -176,7 +177,7 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         updateSlideValue(progress);
-        updateHeaderValueText(null, progress);
+        updateHeaderValueText((TextView) ((ViewGroup) seekBar.getParent()).findViewById(R.id.pref_header_value), progress);
     }
 
     @Override
