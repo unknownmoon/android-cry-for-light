@@ -6,6 +6,14 @@
         android:key="light_threshold"
         android:title="@string/pref_cat_light">
 
+        <EditTextPreference
+            android:defaultValue="@integer/pref_light_def_max_val"
+            android:key="pref_light_max"
+            android:title="@string/pref_light_max_title"
+            android:summary="@string/pref_light_max_summary"
+            android:inputType="number"
+            />
+
         <unknownmoon.cryforlight.SliderPreference
             android:defaultValue="@integer/pref_light_def_val"
             android:key="pref_light"

@@ -20,4 +20,6 @@
     <string name="pref_sound_file_title">Sound</string>
     <string name="current_brightness_header">Current Info</string>
     <string name="current_brightness_value_format">%1$.2f lx</string>
+    <string name="pref_light_max_title">Max Brightness</string>
+    <string name="pref_light_max_summary">The max value of the brightness setting.</string>
 </resources>
