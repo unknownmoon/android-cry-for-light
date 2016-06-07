@@ -1,30 +1,36 @@
 package unknownmoon.cryforlight;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.TypedArray;
 import android.preference.Preference;
+import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 /**
  * Created by jing on 05/06/2016.
  */
-public class SliderPreference extends Preference implements SeekBar.OnSeekBarChangeListener {
-
+public class SliderPreference extends Preference implements SeekBar.OnSeekBarChangeListener, PreferenceManager.OnActivityDestroyListener {
     public static Boolean DISPLAY_HEADER_LABEL = true;
     public static Boolean DISPLAY_HEADER_VALUE = true;
     public static int SLIDER_MAX = 100;
-
+    public final String TAG = "SliderPreference";
     private Boolean mDisplayHeaderLabel;
     private Boolean mDisplayHeaderValue;
     private String mSummary;
     private String mHeaderLabelText;
     private String mHeaderValueFormat;
+    private int DEFAULT_SLIDER_MAX;
     private int mSliderMax;
     private int mSliderValue;
+    private BroadcastReceiver mMessageReceiver;
 
     public SliderPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
@@ -37,7 +43,28 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
         mSummary = a.getString(R.styleable.SliderPreference_summary);
         mHeaderLabelText = a.getString(R.styleable.SliderPreference_headerLabelText);
         mHeaderValueFormat = a.getString(R.styleable.SliderPreference_headerValueFormat);
-        mSliderMax = a.getInt(R.styleable.SliderPreference_sliderMaxValue, SLIDER_MAX);
+        DEFAULT_SLIDER_MAX = a.getInt(R.styleable.SliderPreference_sliderMaxValue, SLIDER_MAX);
+        mSliderMax = getPersistedInt(DEFAULT_SLIDER_MAX);
+
+        mMessageReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, final Intent intent) {
+                String key = intent.getStringExtra("key");
+
+                if (key.equals(getKey())) {
+                    int changedMax = intent.getIntExtra("changedMax", -1);
+                    Log.d(TAG, "changedMax: " + changedMax);
+                    if (changedMax > 0) {
+                        Log.d(TAG, "update slider max: " + mSliderMax);
+                        updateSliderMax(null, changedMax);
+                        persistSlideValue();
+                    }
+                }
+            }
+        };
+
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mMessageReceiver,
+                new IntentFilter("on-slider-max-changed"));
 
         a.recycle();
     }
@@ -65,7 +92,7 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
 
         if (seekBarView != null) {
 
-            seekBarView.setMax(mSliderMax);
+            updateSliderMax(seekBarView, mSliderMax);
             seekBarView.setProgress(mSliderValue);
 
             seekBarView.setOnSeekBarChangeListener(this);
@@ -112,9 +139,28 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
 
     }
 
-    private void updateHeaderValueText(TextView v, int value) {
-        if (v != null) {
-            v.setText(String.format(mHeaderValueFormat, value));
+    private void updateSliderMax(SeekBar seekBarView, int max) {
+        if (seekBarView == null) {
+            seekBarView = (SeekBar) getView(null, null).findViewById(R.id.pref_seek_bar);
+        }
+
+        mSliderMax = max > 0 ? max : DEFAULT_SLIDER_MAX;
+
+        if (seekBarView != null) {
+            seekBarView.setMax(max);
+            mSliderValue = Math.min(mSliderValue, max);
+            seekBarView.setProgress(mSliderValue);
+        }
+    }
+
+    private void updateHeaderValueText(TextView headerValueView, int value) {
+
+        if (headerValueView == null) {
+            headerValueView = (TextView) getView(null, null).findViewById(R.id.pref_header_value);
+        }
+
+        if (headerValueView != null) {
+            headerValueView.setText(String.format(mHeaderValueFormat, value));
         }
     }
 
@@ -124,13 +170,13 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
 
     private void persistSlideValue() {
         persistInt(mSliderValue);
+        notifyChanged();
     }
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        TextView headerValueView = (TextView) getView(null, (ViewGroup) seekBar.getParent()).findViewById(R.id.pref_header_value);
         updateSlideValue(progress);
-        updateHeaderValueText(headerValueView, progress);
+        updateHeaderValueText(null, progress);
     }
 
     @Override
@@ -140,6 +186,10 @@ public class SliderPreference extends Preference implements SeekBar.OnSeekBarCha
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         persistSlideValue();
-        notifyChanged();
+    }
+
+    @Override
+    public void onActivityDestroy() {
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);
     }
 }

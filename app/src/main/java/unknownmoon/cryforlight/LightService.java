@@ -34,6 +34,7 @@ public class LightService extends Service {
     private int mPrefSoundLevel;
     private String mPrefSoundFile;
     private int mPrefLightThreshold;
+    private int mPrefLightThresholdMaxValue;
     private float mLastBrightness;
     private Boolean mIsCrying = false;
     private Ringtone mRingtone;
@@ -162,6 +163,7 @@ public class LightService extends Service {
 
     private void syncPrefs() {
         syncPref("pref_light");
+        syncPref("pref_light_max");
         syncPref("pref_sound_level");
         syncPref("pref_sound_file");
     }
@@ -172,6 +174,9 @@ public class LightService extends Service {
         switch (key) {
             case "pref_light":
                 updateLightThreshold(sharedPrefs.getInt(key, mPrefLightThreshold));
+                break;
+            case "pref_light_max":
+                updateLightThresholdMaxValue(Integer.parseInt(sharedPrefs.getString(key, "" + mPrefLightThresholdMaxValue)));
                 break;
             case "pref_sound_level":
                 updateSoundLevel(sharedPrefs.getInt(key, mPrefSoundLevel));
@@ -243,6 +248,11 @@ public class LightService extends Service {
         mPrefLightThreshold = lvl;
         shouldWeCry();
         Log.d(TAG, "light - " + lvl);
+    }
+
+    private void updateLightThresholdMaxValue(int max) {
+        mPrefLightThresholdMaxValue = max;
+        updateLightThreshold(Math.min(mPrefLightThreshold, mPrefLightThresholdMaxValue));
     }
 
     private void shouldWeCry() {
