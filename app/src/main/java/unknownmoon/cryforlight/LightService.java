@@ -331,7 +331,7 @@ public class LightService extends Service {
             return;
         }
 
-        if (mLastBrightness <= mPrefLightThreshold && !mIsCrying) {
+        if (mLastBrightness <= mPrefLightThreshold && (!mIsCrying || (mRingtone != null && !mRingtone.isPlaying() && mIsCrying))) {
 
             mIsCrying = true;
             Log.d(TAG, "I'm crying!!!");
