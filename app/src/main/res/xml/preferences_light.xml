@@ -8,10 +8,10 @@
 
         <EditTextPreference
             android:defaultValue="@integer/pref_light_def_max_val"
-            android:key="pref_light_max"
-            android:title="@string/pref_light_max_title"
-            android:summary="@string/pref_light_max_summary"
             android:inputType="number"
+            android:key="pref_light_max"
+            android:summary="@string/pref_light_max_summary"
+            android:title="@string/pref_light_max_title"
             />
 
         <unknownmoon.cryforlight.SliderPreference
@@ -20,8 +20,8 @@
             android:layout="@layout/preference_slider"
             app:headerLabelText="@string/pref_light_title"
             app:headerValueFormat="@string/pref_light_value_format"
-            app:summary="@string/pref_light_summary"
-            app:sliderMaxValue="@integer/pref_light_def_max_val"/>
+            app:sliderMaxValue="@integer/pref_light_def_max_val"
+            app:summary="@string/pref_light_summary"/>
 
     </PreferenceCategory>
 

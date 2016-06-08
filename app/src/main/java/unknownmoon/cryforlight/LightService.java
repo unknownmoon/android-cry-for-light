@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Icon;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -29,6 +30,7 @@ public class LightService extends Service {
     private final String TAG = "CFL";
     private final int NOTIFICATION_ID = 1;
     protected BroadcastReceiver mMessageReceiver;
+    protected BroadcastReceiver mActionMessageReceiver;
     private SensorHandler mSensorHandler;
     private Toast mToast = null;
     private int mPrefSoundLevel;
@@ -36,10 +38,11 @@ public class LightService extends Service {
     private int mPrefLightThreshold;
     private int mPrefLightThresholdMaxValue;
     private float mLastBrightness;
-    private Boolean mIsCrying = false;
+    private boolean mIsCrying = false;
     private Ringtone mRingtone;
     private int mOriginalVol;
     private PowerManager.WakeLock mWakeLock;
+    private boolean mIsPaused = false;
 
     public LightService() {
     }
@@ -67,7 +70,33 @@ public class LightService extends Service {
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("on-configuration-changed"));
 
-        acquireWakeLock();
+
+        mActionMessageReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, final Intent intent) {
+                Log.d(TAG, "Action received: " + intent.getAction());
+                switch (intent.getAction()) {
+                    case LightActionService.ACTION_PAUSE:
+                        pauseService();
+                        break;
+                    case LightActionService.ACTION_RESUME:
+                        resumeService();
+                        break;
+                    case LightActionService.ACTION_EXIT:
+                        stopSelf();
+                        break;
+                }
+            }
+        };
+
+        IntentFilter iFilter = new IntentFilter();
+        iFilter.addAction(LightActionService.ACTION_PAUSE);
+        iFilter.addAction(LightActionService.ACTION_RESUME);
+        iFilter.addAction(LightActionService.ACTION_EXIT);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mActionMessageReceiver, iFilter);
+
+        resumeService();
     }
 
     @Override
@@ -83,11 +112,15 @@ public class LightService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mBuilder.setSmallIcon(R.mipmap.ic_launcher)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setStyle(new Notification.BigTextStyle().bigText("Change service status?"))
                 .setContentTitle("Cry for Light is on!")
                 .setContentText("Let's keep the light on!")
                 .setAutoCancel(true)
-//                .setSound(Uri.parse("content://media/internal/audio/media/29")) // TODO
-                .setContentIntent(pendingIntent);
+                .setContentIntent(pendingIntent)
+                .addAction(new Notification.Action.Builder(loadIcon(R.drawable.ic_service_off), "Pause", getActionIntent(LightActionService.ACTION_PAUSE)).build())
+                .addAction(new Notification.Action.Builder(loadIcon(R.drawable.ic_service_on), "Resume", getActionIntent(LightActionService.ACTION_RESUME)).build())
+                .addAction(new Notification.Action.Builder(loadIcon(R.drawable.ic_close), "Exit", getActionIntent(LightActionService.ACTION_EXIT)).build());
 
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
@@ -110,6 +143,11 @@ public class LightService extends Service {
         broadcastStarted();
 
         return START_STICKY;
+    }
+
+    private Icon loadIcon(int resId) {
+        Icon ico = Icon.createWithResource(getPackageName(), resId);
+        return ico;
     }
 
     protected void showMsg(String msg, int duration) {
@@ -140,10 +178,10 @@ public class LightService extends Service {
             sensorManager.unregisterListener(mSensorHandler);
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mActionMessageReceiver);
 
         releaseWakeLock();
 
-        showMsg("Service Off", Toast.LENGTH_SHORT);
         broadcastStopped();
     }
 
@@ -213,9 +251,7 @@ public class LightService extends Service {
 
                 setupRingtone();
 
-                if (mIsCrying) {
-                    mRingtone.play();
-                }
+                shouldWeCry();
             }
         }
     }
@@ -256,6 +292,15 @@ public class LightService extends Service {
     }
 
     private void shouldWeCry() {
+        if (mIsPaused) {
+            Log.d(TAG, "I'm sleeping..");
+
+            if (mRingtone != null && mRingtone.isPlaying()) {
+                mRingtone.stop();
+            }
+            return;
+        }
+
         if (mLastBrightness <= mPrefLightThreshold && !mIsCrying) {
 
             mIsCrying = true;
@@ -284,9 +329,31 @@ public class LightService extends Service {
     }
 
     private void releaseWakeLock() {
-        if (mWakeLock != null) {
+        if (mWakeLock != null && mWakeLock.isHeld()) {
             mWakeLock.release();
         }
+    }
+
+    private void pauseService() {
+        Log.d(TAG, "pause service.");
+        mIsPaused = true;
+        releaseWakeLock();
+        shouldWeCry();
+    }
+
+    private void resumeService() {
+        Log.d(TAG, "resume service.");
+        mIsPaused = false;
+        acquireWakeLock();
+        shouldWeCry();
+    }
+
+    private PendingIntent getActionIntent(String action) {
+
+        Intent actionIntent = new Intent(this, LightActionService.class);
+        actionIntent.setAction(action);
+        return PendingIntent.getService(this, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
     }
 
     private final class SensorHandler implements SensorEventListener {
@@ -296,7 +363,6 @@ public class LightService extends Service {
             if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
                 mLastBrightness = event.values[0];
 
-                Log.d(TAG, String.valueOf(mLastBrightness));
                 shouldWeCry();
             }
         }
