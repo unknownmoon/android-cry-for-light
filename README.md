@@ -52,5 +52,5 @@ This app is then used to keep the lights on, by taking advantage of the sensors 
 ### Feature Level - Advanced
 
  - [x] The APP is running as a background service, and displayed in the notification bar when running.
- - [ ] The user can `pause`/`resume`/`stop` the service in the notification bar directly, while `stop` also stop the background service.
+ - [x] The user can `pause`/`resume`/`stop` the service in the notification bar directly, while `stop` also stop the background service.
  - [ ] Automatically stare/stop service by sensing the user behaviours: pick up to stop, hand off to start (after 2 seconds delay perhaps).
