@@ -1,6 +1,7 @@
 package unknownmoon.cryforlight;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -31,6 +32,7 @@ public class LightService extends Service {
     private final int NOTIFICATION_ID = 1;
     protected BroadcastReceiver mMessageReceiver;
     protected BroadcastReceiver mActionMessageReceiver;
+    Notification.Builder mBuilder;
     private SensorHandler mSensorHandler;
     private Toast mToast = null;
     private int mPrefSoundLevel;
@@ -106,22 +108,6 @@ public class LightService extends Service {
 
         mOriginalVol = audioManager.getStreamVolume(AudioManager.STREAM_RING);
 
-        Notification.Builder mBuilder = new Notification.Builder(getApplicationContext());
-
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        mBuilder.setSmallIcon(loadIcon(R.drawable.ic_logo_white))
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setStyle(new Notification.BigTextStyle().bigText("Change service status?"))
-                .setContentTitle("Cry for Light is on!")
-                .setContentText("Let's keep the light on!")
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .addAction(new Notification.Action.Builder(loadIcon(R.drawable.ic_service_off), "Pause", getActionIntent(LightActionService.ACTION_PAUSE)).build())
-                .addAction(new Notification.Action.Builder(loadIcon(R.drawable.ic_service_on), "Resume", getActionIntent(LightActionService.ACTION_RESUME)).build())
-                .addAction(new Notification.Action.Builder(loadIcon(R.drawable.ic_close), "Exit", getActionIntent(LightActionService.ACTION_EXIT)).build());
-
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 
@@ -138,11 +124,55 @@ public class LightService extends Service {
 
         syncPrefs();
 
-        startForeground(NOTIFICATION_ID, mBuilder.build());
+        startForeground(NOTIFICATION_ID, updateNotification());
 
         broadcastStarted();
 
         return START_STICKY;
+    }
+
+    private Notification updateNotification() {
+        if (mBuilder == null) {
+            mBuilder = new Notification.Builder(getApplicationContext());
+        }
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setSmallIcon(loadIcon(R.drawable.ic_logo_white))
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setContentTitle("Cry for Light is on!")
+                .setContentText("Let's keep the light on!")
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .addAction(new Notification.Action.Builder(loadIcon(R.drawable.ic_service_off), "Pause", getActionIntent(LightActionService.ACTION_PAUSE)).build())
+                .addAction(new Notification.Action.Builder(loadIcon(R.drawable.ic_service_on), "Resume", getActionIntent(LightActionService.ACTION_RESUME)).build())
+                .addAction(new Notification.Action.Builder(loadIcon(R.drawable.ic_close), "Exit", getActionIntent(LightActionService.ACTION_EXIT)).build())
+                .setStyle(constructNotificationStyle());
+
+        return mBuilder.build();
+    }
+
+    private void updateNotificationAndNotify() {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID, updateNotification());
+    }
+
+    private Notification.BigTextStyle constructNotificationStyle() {
+
+        String status = "";
+        Notification.BigTextStyle style = new Notification.BigTextStyle();
+
+        if (mIsPaused) {
+            status = "paused.";
+        } else {
+            status = "watching..";
+        }
+
+        style.bigText("Change service status?")
+                .setBigContentTitle("Cry for Light is " + status);
+
+        return style;
     }
 
     private Icon loadIcon(int resId) {
@@ -336,15 +366,21 @@ public class LightService extends Service {
 
     private void pauseService() {
         Log.d(TAG, "pause service.");
+
         mIsPaused = true;
         releaseWakeLock();
+
+        updateNotificationAndNotify();
         shouldWeCry();
     }
 
     private void resumeService() {
         Log.d(TAG, "resume service.");
+
         mIsPaused = false;
         acquireWakeLock();
+
+        updateNotificationAndNotify();
         shouldWeCry();
     }
 
