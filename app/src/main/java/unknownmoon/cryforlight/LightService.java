@@ -323,7 +323,6 @@ public class LightService extends Service {
             if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
                 mLastBrightness = event.values[0];
 
-                Log.d(TAG, String.valueOf(mLastBrightness));
                 shouldWeCry();
             }
         }
