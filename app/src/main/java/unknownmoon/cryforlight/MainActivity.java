@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+    public final String TAG = "Cry for Light";
     protected BroadcastReceiver mMessageReceiver;
     private Boolean mIsServiceOn = false;
     private Toast mToast = null;
@@ -45,7 +46,11 @@ public class MainActivity extends AppCompatActivity {
                 FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
                 fab.setActivated(mIsServiceOn);
 
-                showMsg("Service On", Toast.LENGTH_SHORT);
+                if (mIsServiceOn) {
+                    showMsg("Service On", Toast.LENGTH_SHORT);
+                } else {
+                    showMsg("Service Off", Toast.LENGTH_SHORT);
+                }
             }
         };
 
