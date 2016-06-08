@@ -148,7 +148,6 @@ public class LightService extends Service {
 
         releaseWakeLock();
 
-        showMsg("Service Off", Toast.LENGTH_SHORT);
         broadcastStopped();
     }
 
