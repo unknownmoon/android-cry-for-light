@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Icon;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -117,9 +118,9 @@ public class LightService extends Service {
                 .setContentText("Let's keep the light on!")
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
-                .addAction(new Notification.Action.Builder(null, "Pause", getActionIntent(LightActionService.ACTION_PAUSE)).build())
-                .addAction(new Notification.Action.Builder(null, "Resume", getActionIntent(LightActionService.ACTION_RESUME)).build())
-                .addAction(new Notification.Action.Builder(null, "Exit", getActionIntent(LightActionService.ACTION_EXIT)).build());
+                .addAction(new Notification.Action.Builder(loadIcon(R.drawable.ic_service_off), "Pause", getActionIntent(LightActionService.ACTION_PAUSE)).build())
+                .addAction(new Notification.Action.Builder(loadIcon(R.drawable.ic_service_on), "Resume", getActionIntent(LightActionService.ACTION_RESUME)).build())
+                .addAction(new Notification.Action.Builder(loadIcon(R.drawable.ic_close), "Exit", getActionIntent(LightActionService.ACTION_EXIT)).build());
 
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
@@ -142,6 +143,11 @@ public class LightService extends Service {
         broadcastStarted();
 
         return START_STICKY;
+    }
+
+    private Icon loadIcon(int resId) {
+        Icon ico = Icon.createWithResource(getPackageName(), resId);
+        return ico;
     }
 
     protected void showMsg(String msg, int duration) {
