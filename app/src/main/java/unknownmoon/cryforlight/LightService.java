@@ -213,9 +213,7 @@ public class LightService extends Service {
 
                 setupRingtone();
 
-                if (mIsCrying) {
-                    mRingtone.play();
-                }
+                shouldWeCry();
             }
         }
     }
