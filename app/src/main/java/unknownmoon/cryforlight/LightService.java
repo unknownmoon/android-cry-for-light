@@ -36,10 +36,11 @@ public class LightService extends Service {
     private int mPrefLightThreshold;
     private int mPrefLightThresholdMaxValue;
     private float mLastBrightness;
-    private Boolean mIsCrying = false;
+    private boolean mIsCrying = false;
     private Ringtone mRingtone;
     private int mOriginalVol;
     private PowerManager.WakeLock mWakeLock;
+    private boolean mIsPaused = false;
 
     public LightService() {
     }
@@ -67,7 +68,7 @@ public class LightService extends Service {
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("on-configuration-changed"));
 
-        acquireWakeLock();
+        resumeService();
     }
 
     @Override
@@ -254,6 +255,15 @@ public class LightService extends Service {
     }
 
     private void shouldWeCry() {
+        if (mIsPaused) {
+            Log.d(TAG, "I'm sleeping..");
+
+            if (mRingtone != null && mRingtone.isPlaying()) {
+                mRingtone.stop();
+            }
+            return;
+        }
+
         if (mLastBrightness <= mPrefLightThreshold && !mIsCrying) {
 
             mIsCrying = true;
@@ -285,6 +295,18 @@ public class LightService extends Service {
         if (mWakeLock != null) {
             mWakeLock.release();
         }
+    }
+
+    private void pauseService() {
+        mIsPaused = true;
+        releaseWakeLock();
+        shouldWeCry();
+    }
+
+    private void resumeService() {
+        mIsPaused = false;
+        acquireWakeLock();
+        shouldWeCry();
     }
 
     private final class SensorHandler implements SensorEventListener {
