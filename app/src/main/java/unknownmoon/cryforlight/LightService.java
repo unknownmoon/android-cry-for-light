@@ -84,11 +84,15 @@ public class LightService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mBuilder.setSmallIcon(R.mipmap.ic_launcher)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setStyle(new Notification.BigTextStyle().bigText("Change service status?"))
                 .setContentTitle("Cry for Light is on!")
                 .setContentText("Let's keep the light on!")
                 .setAutoCancel(true)
-//                .setSound(Uri.parse("content://media/internal/audio/media/29")) // TODO
-                .setContentIntent(pendingIntent);
+                .setContentIntent(pendingIntent)
+                .addAction(new Notification.Action.Builder(null, "Pause", pendingIntent).build())
+                .addAction(new Notification.Action.Builder(null, "Resume", pendingIntent).build())
+                .addAction(new Notification.Action.Builder(null, "Exit", pendingIntent).build());
 
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
@@ -301,6 +305,10 @@ public class LightService extends Service {
         mIsPaused = true;
         releaseWakeLock();
         shouldWeCry();
+    }
+
+    private void stopService() {
+        stopSelf();
     }
 
     private void resumeService() {
