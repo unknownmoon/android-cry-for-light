@@ -29,6 +29,7 @@ public class LightService extends Service {
     private final String TAG = "CFL";
     private final int NOTIFICATION_ID = 1;
     protected BroadcastReceiver mMessageReceiver;
+    protected BroadcastReceiver mActionMessageReceiver;
     private SensorHandler mSensorHandler;
     private Toast mToast = null;
     private int mPrefSoundLevel;
@@ -68,6 +69,32 @@ public class LightService extends Service {
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("on-configuration-changed"));
 
+
+        mActionMessageReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, final Intent intent) {
+                Log.d(TAG, "Action received: " + intent.getAction());
+                switch (intent.getAction()) {
+                    case LightActionService.ACTION_PAUSE:
+                        pauseService();
+                        break;
+                    case LightActionService.ACTION_RESUME:
+                        resumeService();
+                        break;
+                    case LightActionService.ACTION_EXIT:
+                        stopSelf();
+                        break;
+                }
+            }
+        };
+
+        IntentFilter iFilter = new IntentFilter();
+        iFilter.addAction(LightActionService.ACTION_PAUSE);
+        iFilter.addAction(LightActionService.ACTION_RESUME);
+        iFilter.addAction(LightActionService.ACTION_EXIT);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mActionMessageReceiver, iFilter);
+
         resumeService();
     }
 
@@ -90,9 +117,9 @@ public class LightService extends Service {
                 .setContentText("Let's keep the light on!")
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
-                .addAction(new Notification.Action.Builder(null, "Pause", pendingIntent).build())
-                .addAction(new Notification.Action.Builder(null, "Resume", pendingIntent).build())
-                .addAction(new Notification.Action.Builder(null, "Exit", pendingIntent).build());
+                .addAction(new Notification.Action.Builder(null, "Pause", getActionIntent(LightActionService.ACTION_PAUSE)).build())
+                .addAction(new Notification.Action.Builder(null, "Resume", getActionIntent(LightActionService.ACTION_RESUME)).build())
+                .addAction(new Notification.Action.Builder(null, "Exit", getActionIntent(LightActionService.ACTION_EXIT)).build());
 
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
@@ -145,6 +172,7 @@ public class LightService extends Service {
             sensorManager.unregisterListener(mSensorHandler);
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mActionMessageReceiver);
 
         releaseWakeLock();
 
@@ -295,25 +323,31 @@ public class LightService extends Service {
     }
 
     private void releaseWakeLock() {
-        if (mWakeLock != null) {
+        if (mWakeLock != null && mWakeLock.isHeld()) {
             mWakeLock.release();
         }
     }
 
     private void pauseService() {
+        Log.d(TAG, "pause service.");
         mIsPaused = true;
         releaseWakeLock();
         shouldWeCry();
     }
 
-    private void stopService() {
-        stopSelf();
-    }
-
     private void resumeService() {
+        Log.d(TAG, "resume service.");
         mIsPaused = false;
         acquireWakeLock();
         shouldWeCry();
+    }
+
+    private PendingIntent getActionIntent(String action) {
+
+        Intent actionIntent = new Intent(this, LightActionService.class);
+        actionIntent.setAction(action);
+        return PendingIntent.getService(this, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
     }
 
     private final class SensorHandler implements SensorEventListener {

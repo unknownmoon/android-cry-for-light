@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+    public final String TAG = "Cry for Light";
     protected BroadcastReceiver mMessageReceiver;
     private Boolean mIsServiceOn = false;
     private Toast mToast = null;
