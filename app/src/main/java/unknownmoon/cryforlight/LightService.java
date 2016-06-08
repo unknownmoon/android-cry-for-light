@@ -111,7 +111,7 @@ public class LightService extends Service {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        mBuilder.setSmallIcon(R.mipmap.ic_launcher)
+        mBuilder.setSmallIcon(loadIcon(R.drawable.ic_logo_white))
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setStyle(new Notification.BigTextStyle().bigText("Change service status?"))
                 .setContentTitle("Cry for Light is on!")
