@@ -47,7 +47,7 @@ ___ALERT:___ The `settings` screen, namely the home screen, is not happy with th
 
 > Too lazy to publish to Android market
 
-Download APK file from [here](https://github.com/unknownmoon/android-cry-for-light/releases/download/v0.3.3/app-debug.apk) and install it.
+Download APK file from [here](https://github.com/unknownmoon/android-cry-for-light/releases/download/v0.3.1/app-debug.apk) and install it.
 
 <a name="features-paused"></a>
 ## Features (Paused..)
