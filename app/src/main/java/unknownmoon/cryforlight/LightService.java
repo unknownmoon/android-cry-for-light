@@ -279,10 +279,16 @@ public class LightService extends Service {
 
                 mRingtone = ringtone;
 
-                setupRingtone();
-
                 shouldWeCry();
             }
+        }
+    }
+
+    private void startRingtone() {
+        setupRingtone();
+
+        if (mRingtone != null) {
+            mRingtone.play();
         }
     }
 
@@ -325,9 +331,7 @@ public class LightService extends Service {
         if (mIsPaused) {
             Log.d(TAG, "I'm sleeping..");
 
-            if (mRingtone != null && mRingtone.isPlaying()) {
-                mRingtone.stop();
-            }
+            stopRingtone();
             return;
         }
 
@@ -336,18 +340,14 @@ public class LightService extends Service {
             mIsCrying = true;
             Log.d(TAG, "I'm crying!!!");
 
-            if (mRingtone != null) {
-                mRingtone.play();
-            }
+            startRingtone();
 
         } else if (mLastBrightness > mPrefLightThreshold && mIsCrying) {
 
             mIsCrying = false;
             Log.d(TAG, "Now I'm fine...");
 
-            if (mRingtone != null && mRingtone.isPlaying()) {
-                mRingtone.stop();
-            }
+            stopRingtone();
         }
     }
 

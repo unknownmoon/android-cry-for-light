@@ -31,8 +31,6 @@ This app is then used to keep the lights on, by taking advantage of the sensors 
 
 __Warning:__ Only tested against Nexus 5X under Android 6.0.1 (API version 23), in __portrait__ mode.
 
-___ALERT:___ The `settings` screen, namely the home screen, is not happy with the __landscape__ mode for the moment.
-
  - Use notification to `pause`/`resume`/`exit` the service, even the screen is locked. once it's started.
  - Functional after screen lock and clean the main screen from the recent task stack (the [Overview Screen](https://developer.android.com/images/components/recents.png)).
  - In the main screen, other than `start`/`exit` the service.
@@ -47,7 +45,7 @@ ___ALERT:___ The `settings` screen, namely the home screen, is not happy with th
 
 > Too lazy to publish to Android market
 
-Download APK file from [here](https://github.com/unknownmoon/android-cry-for-light/releases/download/v0.3.1/app-debug.apk) and install it.
+Download APK file from [here](https://github.com/unknownmoon/android-cry-for-light/releases/download/v0.3.2/app-debug.apk) and install it.
 
 <a name="features-paused"></a>
 ## Features (Paused..)
