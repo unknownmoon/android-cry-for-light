@@ -1,6 +1,7 @@
 # Cry for Light
 
-> Note that this project is still in pre-stable stage, but it fits my personal demand now, and the main purpose of this little project is to try Android project.
+> Note that this project is still in pre-stable stage, but it fits my personal demand now, and the main purpose of this little project is to try Android project.  
+> In that case, this project may not be updated later, if no critical issue or non-trivial requirements.
 
 [![GitHub version](https://badge.fury.io/gh/unknownmoon%2Fandroid-cry-for-light.svg)](https://badge.fury.io/gh/unknownmoon%2Fandroid-cry-for-light)
 
@@ -45,7 +46,7 @@ __Warning:__ Only tested against Nexus 5X under Android 6.0.1 (API version 23), 
 
 > Too lazy to publish to Android market
 
-Download APK file from [here](https://github.com/unknownmoon/android-cry-for-light/releases/download/v0.3.2/app-debug.apk) and install it.
+Download APK file from [here](https://github.com/unknownmoon/android-cry-for-light/releases/download/v0.3.3/app-debug.apk) and install it.
 
 <a name="features-paused"></a>
 ## Features (Paused..)
